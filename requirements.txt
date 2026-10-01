@@ -1,0 +1,21 @@
+# Kafka client (pure-python, no native deps -> portable across OS/Python versions)
+kafka-python==3.0.11
+
+# AWS SDK
+boto3>=1.34
+
+# Streaming job (requires Java 11/17 on the host or run via Docker image)
+pyspark==3.5.1
+
+# Dashboard
+streamlit==1.38.0
+plotly==5.24.0
+pandas==2.2.2
+
+# Resilience / utils
+python-dotenv==1.0.1
+tenacity==8.5.0
+
+# Testing
+pytest==8.3.2
+pytest-mock==3.14.0

@@ -1,0 +1,62 @@
+version: "3.8"
+
+# Local dev stack: single-node Kafka (KRaft mode, no Zookeeper) + LocalStack
+# standing in for AWS (S3 / Glue / Athena) so the whole pipeline is runnable
+# with zero cloud cost. Swap the AWS_ENDPOINT_URL env var to point at real
+# AWS when you're ready to deploy (see docs/ARCHITECTURE.md).
+
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: pipeline-kafka
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_RETENTION_HOURS: 168 # 7-day replay window
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      CLUSTER_ID: "pipeline-cluster-1"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: pipeline-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
+  localstack:
+    image: localstack/localstack:3.6
+    container_name: pipeline-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,glue,athena
+      DEBUG: 0
+      PERSISTENCE: 1
+    volumes:
+      - localstack-data:/var/lib/localstack
+
+volumes:
+  kafka-data:
+  localstack-data:
