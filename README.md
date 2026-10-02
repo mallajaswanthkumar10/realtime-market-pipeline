@@ -15,28 +15,21 @@ points at real AWS by changing one environment variable.
 
 ```mermaid
 flowchart LR
-    subgraph Producers
-        P1[stock_producer.py]
-        P2[iot_producer.py]
+    P1[stock_producer.py]
+    P2[iot_producer.py]
+
+    T1[(stock.raw)]
+    T2[(iot.raw)]
+    T3[(alerts)]
+    T4[(alerts.dlq)]
+
+    subgraph Spark [PySpark Structured Streaming]
+        W[5-min tumbling window aggregation]
+        A[Anomaly detection - zscore over 2]
+        E[Enrichment via broadcast join]
     end
 
-    subgraph Kafka
-        T1[(stock.raw)]
-        T2[(iot.raw)]
-        T3[(alerts)]
-        T4[(alerts.dlq)]
-    end
-
-    subgraph Spark["PySpark Structured Streaming"]
-        W["5-min tumbling window
-        aggregation"]
-        A["Anomaly detection
-        (z-score > 2std)"]
-        E["Enrichment
-        (broadcast join w/ S3 ref data)"]
-    end
-
-    subgraph AWS["S3 / Glue / Athena (LocalStack or real AWS)"]
+    subgraph DataLake [AWS S3, Glue, Athena]
         S3R[(S3 raw)]
         S3P[(S3 processed)]
         S3M[(S3 mart)]
@@ -44,24 +37,22 @@ flowchart LR
         Athena[Athena SQL]
     end
 
-    subgraph Consumers
-        AC[alert_consumer.py
-        retry + circuit breaker]
-        D[Streamlit dashboard]
-    end
+    AC[alert_consumer.py - retry plus circuit breaker]
+    D[Streamlit dashboard]
 
     P1 --> T1
     P2 --> T2
     T1 --> Spark
-    S3R -. reference data .-> E
+    S3R --> E
     W --> S3M
     E --> S3P
     A --> T3
     T3 --> AC
-    AC -- repeated failure --> T4
-    T4 -. replay.py .-> T3
-    S3P --> Glue --> Athena
+    AC -->|repeated failure| T4
+    T4 -.->|replay| T3
+    S3P --> Glue
     S3M --> Glue
+    Glue --> Athena
     T1 --> D
     T3 --> D
 ```
