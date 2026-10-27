@@ -35,6 +35,7 @@ import logging
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
+from pyspark.sql.streaming import StreamingQuery
 
 from streaming import enrichment
 from streaming.anomaly_detection import tag_anomalies_df
@@ -94,7 +95,7 @@ def read_raw_stream(spark: SparkSession) -> DataFrame:
     return valid.withWatermark("event_time", config.WATERMARK_DELAY)
 
 
-def start_windowed_aggregates_sink(events: DataFrame) -> "StreamingQuery":
+def start_windowed_aggregates_sink(events: DataFrame) -> StreamingQuery:
     """Query A: stateful 5-minute tumbling-window aggregates, written
     continuously to the mart layer, partitioned by date/hour."""
     windowed = events.groupBy(
