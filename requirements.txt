@@ -10,7 +10,7 @@ pyspark==3.5.1
 # Dashboard
 streamlit==1.38.0
 plotly==5.24.0
-pandas==2.2.2
+pandas==3.1.0
 
 # Resilience / utils
 python-dotenv==1.0.1
