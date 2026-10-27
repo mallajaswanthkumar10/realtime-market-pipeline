@@ -13,7 +13,7 @@ plotly==5.24.0
 pandas==2.2.2
 
 # Resilience / utils
-python-dotenv==1.0.1
+python-dotenv==1.2.4
 tenacity==8.5.0
 
 # Testing
