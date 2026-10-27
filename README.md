@@ -1,5 +1,8 @@
 # Real-Time Market Data Pipeline
 
+[![CI](https://github.com/mallajaswanthkumar10/realtime-market-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/mallajaswanthkumar10/realtime-market-pipeline/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A demo pipeline that simulates live stock prices, streams them through
 **Kafka**, processes them in real time with **PySpark**, saves the
 results to **AWS S3** (cataloged with **Glue**, queryable via **Athena**),

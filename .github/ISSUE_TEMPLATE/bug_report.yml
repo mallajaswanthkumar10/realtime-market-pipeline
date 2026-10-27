@@ -1,0 +1,25 @@
+name: Bug report
+description: Something doesn't work the way the README/docs say it should
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Commands you ran, input data, config - enough to reproduce it.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "OS, Python version, how you installed deps"
+    validations:
+      required: false
