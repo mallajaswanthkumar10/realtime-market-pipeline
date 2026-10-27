@@ -14,7 +14,7 @@ pandas==2.2.2
 
 # Resilience / utils
 python-dotenv==1.0.1
-tenacity==8.5.0
+tenacity==9.2.1
 
 # Testing
 pytest==8.3.2
